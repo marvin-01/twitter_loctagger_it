@@ -1,6 +1,6 @@
 import pandas as pd, re, unidecode, os
 
-class geocode(object):
+class tag_location(object):
     
     """
     Assign an Italian city/region to each twitter user from the 'location field',
