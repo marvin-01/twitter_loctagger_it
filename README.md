@@ -6,5 +6,7 @@
 
 ## Installation
 ```
-https://github.com/marvin-01/twitter_loctagger_it.git
+pip install twitter_loctagger_it
 ```
+
+## How to use
