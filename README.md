@@ -11,11 +11,11 @@ pip install twitter_loctagger_it
 
 ## How to use
 1. Import the package as follows:
-```
+```python
 from twitter_loctagger_it import geocode
 ```
 2. The package requires as input a Python Series (this can also be a Pandas column) and returns a Pandas DataFrame with the original column along with the geocoded results.
-```
+```python
 Location = geocoder.tag_location(df_input['location_original'])
 df_output = Location()
 df_output['id']=df_input['id']
