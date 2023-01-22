@@ -10,9 +10,8 @@ class tag_location(object):
     :type location: List / Series object
     """
     
-    def __init__(self, location):
-        location = clean_list(location)
-        df=pd.DataFrame(location)
+    def __init__(self, df):
+        df['location_clean'] = clean_list(df.iloc[:,0]); df['id']=df.index
         df_istat = pd.read_excel(rel_path('istat.xlsx'),names=['city_string','city','province',\
                                  'province_code','region','geographic_ripartition','state'],
                                  na_filter = False).apply(lambda x: x.str.lower())
@@ -22,21 +21,22 @@ class tag_location(object):
 
         #Generate comparison sets of cities and regions (without accents and without "-")
         df_istat.city_string=df_istat.city_string.apply(lambda x: unidecode.unidecode(x))\
-                     .apply(lambda x: re.sub("-",' ', x))
+                     .apply(lambda x: re.sub("-",' ', x)).apply(lambda x: x.strip())
         df_regions.region_string=df_regions.region_string.apply(lambda x: unidecode.unidecode(x))\
-                      .apply(lambda x: re.sub("-",' ', x))
+                      .apply(lambda x: re.sub("-",' ', x)).apply(lambda x: x.strip())
         df_state = [['italy','italia'],['italia','italia']]
         df_state = pd.DataFrame(df_state, columns=['state_string', 'state'])
 
         duplicate_cities = set(['paternò','paterno','san teodoro','castro','peglio',\
                                 'corvara','livo','samone'])
         mistakable_cities = set(['paese','alto','venezia','aosta','rio','lago','re','vita',\
-                                 'camino','san paolo','viale','montagna','scala','ne'])
+                                 'camino','san paolo','viale','montagna','scala','ne',\
+                                 'bella','campana','barbara','ponte','floresta'])
         cities = set(df_istat.city_string.tolist())-duplicate_cities-mistakable_cities
         regions = set(df_regions.region_string.tolist())-set(['lunigiana'])
         state = set(["italia","italy"])
         
-        self.location=location;self.df=df;self.cities=cities;self.regions=regions
+        self.location=df['location_clean'];self.df=df;self.cities=cities;self.regions=regions
         self.state=state;self.df_istat=df_istat;self.df_regions=df_regions
         self.df_state=df_state
         
@@ -99,10 +99,9 @@ class tag_location(object):
         self.df["state"]=self.df["state"].combine_first(self.df["state_y"])
         
         self.df = self.df.fillna("")
-        self.df = self.df[['location_original','city_derived','region_derived',\
+        self.df = self.df[['id','location_original','location_clean','city_derived','region_derived',\
                            'state_derived','city','province','province_code',\
                            'region_string','region','geographic_ripartition','state']]
-        
         return self.df
         
     def main_loop(self, users, comp_set):
@@ -172,14 +171,16 @@ def clean_list(list_locations):
             u"\ufe0f"  # dingbats
             u"\u3030"
                           "]+", flags=re.UNICODE)
-    pattern = r"[^A-Za-z0-9', ]+"
+    pattern_1 = r"[^a-z', ]+"
+    pattern_2 = r'(\s+via+\s+[a-z]+)|(\s+viale+\s+[a-z]+)'
+    pattern_3 = r',+via+\s+[a-z]+'
     list_locations = list_locations.apply(lambda x: re.sub(emoji_pattern,'', x))\
                                    .apply(lambda x: unidecode.unidecode(x))\
-                                   .apply(lambda x: re.sub(pattern,' ', x))\
-                                   .apply(lambda x: x.strip())\
-                                   .apply(lambda x: " ".join(x.split()))\
                                    .apply(lambda x: x.lower())\
+                                   .apply(lambda x: re.sub(pattern_1,' ', x))\
+                                   .apply(lambda x: re.sub(pattern_2,' ', x))\
+                                   .apply(lambda x: re.sub(pattern_3,', ', x))\
+                                   .apply(lambda x: " ".join(x.split()))\
                                    .apply(lambda x: re.sub(", ",',', x))\
-                                   .apply(lambda x: re.sub(" - ",' ', x))\
-                                   .apply(lambda x: re.sub("-",' ', x))
+                                   
     return list_locations
