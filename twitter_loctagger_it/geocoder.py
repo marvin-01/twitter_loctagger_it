@@ -17,7 +17,7 @@ class tag_location(object):
                                  na_filter = False).apply(lambda x: x.str.lower())
                                
         df_regions = pd.read_excel(rel_path('regions.xlsx'),names=['region_string',\
-                                  'region','state']).apply(lambda x: x.str.lower())
+                                  'region','geographic_ripartition','state']).apply(lambda x: x.str.lower())
 
         #Generate comparison sets of cities and regions (without accents and without "-")
         df_istat.city_string=df_istat.city_string.apply(lambda x: unidecode.unidecode(x))\
@@ -31,7 +31,14 @@ class tag_location(object):
                                 'corvara','livo','samone'])
         mistakable_cities = set(['paese','alto','venezia','aosta','rio','lago','re','vita',\
                                  'camino','san paolo','viale','montagna','scala','ne',\
-                                 'bella','campana','barbara','ponte','floresta'])
+                                 'bella','campana','ponte','floresta','cervo','monti',\
+                                 'front','san lorenzo','sale','boca','grosso','miranda',\
+                                 'carro','varna','bruno','san clemente','margarita',\
+                                 'nicosia','romana','saint denis','villeneuve','malo','calvi',\
+                                 'cologne','ora','mori','monteverde','anzi','toro','san leonardo',\
+                                 'burgos','villalba','porte','rose','viola','force','lettere',\
+                                 'lei','canale','calcio','parenti','none','nave','ala','stella',\
+                                 'ultimo','martello','popoli','rea','giove','zone','naso'])
         cities = set(df_istat.city_string.tolist())-duplicate_cities-mistakable_cities
         regions = set(df_regions.region_string.tolist())-set(['lunigiana'])
         state = set(["italia","italy"])
@@ -95,6 +102,7 @@ class tag_location(object):
         self.df = pd.merge(self.df,self.df_regions, left_on="region_derived", right_on="region_string", how='left')
         self.df = pd.merge(self.df,self.df_state, left_on="state_derived", right_on="state_string", how='left')
         self.df["region"]=self.df["region_x"].combine_first(self.df["region_y"])
+        self.df["geographic_ripartition"]=self.df["geographic_ripartition_x"].combine_first(self.df["geographic_ripartition_y"])
         self.df["state"]=self.df["state"].combine_first(self.df["state_x"])
         self.df["state"]=self.df["state"].combine_first(self.df["state_y"])
         
@@ -172,7 +180,7 @@ def clean_list(list_locations):
             u"\u3030"
                           "]+", flags=re.UNICODE)
     pattern_1 = r"[^a-z', ]+"
-    pattern_2 = r'(\s+via+\s+[a-z]+)|(\s+viale+\s+[a-z]+)'
+    pattern_2 = r'(\s+via+\s+[a-z]+)|(\s+viale+\s+[a-z]+)|(^via+\s+[a-z]+)|(^viale+\s+[a-z]+)'
     pattern_3 = r',+via+\s+[a-z]+'
     list_locations = list_locations.apply(lambda x: re.sub(emoji_pattern,'', x))\
                                    .apply(lambda x: unidecode.unidecode(x))\
