@@ -38,7 +38,10 @@ class tag_location(object):
                                  'cologne','ora','mori','monteverde','anzi','toro','san leonardo',\
                                  'burgos','villalba','porte','rose','viola','force','lettere',\
                                  'lei','canale','calcio','parenti','none','nave','ala','stella',\
-                                 'ultimo','martello','popoli','rea','giove','zone','naso'])
+                                 'ultimo','martello','popoli','rea','giove','zone','naso','dello',\
+                                 'campagna','siano','arco','meta','male','rende','rosa',\
+                                 'colonna','fondi','medicina','trovo','dolce','tornata',\
+                                 'laghi','san vito','s vito','furore','liberi','urbe'])
         cities = set(df_istat.city_string.tolist())-duplicate_cities-mistakable_cities
         regions = set(df_regions.region_string.tolist())-set(['lunigiana'])
         state = set(["italia","italy"])
@@ -77,20 +80,20 @@ class tag_location(object):
         
         #---------------------------------------------------------------------#
         venezia = self.df.copy()
-        venezia.loc[venezia['region_derived'] == 'venezia giulia', "location_original"] = ''
-        venezia.loc[venezia['region_derived'] == 'friuli venezia giulia', "location_original"] = ''
-        venezia.loc[venezia['region_derived'] == 'regione friuli venezia giulia', "location_original"] = ''
+        venezia.loc[venezia['region_derived'] == 'venezia giulia', "location_clean"] = ''
+        venezia.loc[venezia['region_derived'] == 'friuli venezia giulia', "location_clean"] = ''
+        venezia.loc[venezia['region_derived'] == 'regione friuli venezia giulia', "location_clean"] = ''
         venezia = venezia.fillna("") 
-        comma_sep = venezia['location_original'].str.split(',').to_list()
+        comma_sep = venezia['location_clean'].str.split(',').to_list()
         all_separate = self.all_separate_func(comma_sep)
         self.df['city_der_venice'] = self.main_loop(all_separate, set(['venezia']))
         self.df=self.df.mask(self.df=='')
         self.df["city_derived"]=self.df["city_derived"].combine_first(self.df["city_der_venice"])
         
         aosta = self.df.copy()
-        aosta.loc[aosta['region_derived'] == 'aosta valley', "location_original"] = ''
+        aosta.loc[aosta['region_derived'] == 'aosta valley', "location_clean"] = ''
         aosta = aosta.fillna("") 
-        comma_sep = aosta['location_original'].str.split(',').to_list()
+        comma_sep = aosta['location_clean'].str.split(',').to_list()
         all_separate = self.all_separate_func(comma_sep)
         self.df['city_der_aosta'] = self.main_loop(all_separate, set(['aosta']))
         self.df=self.df.mask(self.df=='')
@@ -101,6 +104,7 @@ class tag_location(object):
         self.df = pd.merge(self.df,self.df_istat, left_on="city_derived", right_on="city_string", how='left')
         self.df = pd.merge(self.df,self.df_regions, left_on="region_derived", right_on="region_string", how='left')
         self.df = pd.merge(self.df,self.df_state, left_on="state_derived", right_on="state_string", how='left')
+        
         self.df["region"]=self.df["region_x"].combine_first(self.df["region_y"])
         self.df["geographic_ripartition"]=self.df["geographic_ripartition_x"].combine_first(self.df["geographic_ripartition_y"])
         self.df["state"]=self.df["state"].combine_first(self.df["state_x"])
@@ -180,14 +184,16 @@ def clean_list(list_locations):
             u"\u3030"
                           "]+", flags=re.UNICODE)
     pattern_1 = r"[^a-z', ]+"
-    pattern_2 = r'(\s+via+\s+[a-z]+)|(\s+viale+\s+[a-z]+)|(^via+\s+[a-z]+)|(^viale+\s+[a-z]+)'
-    pattern_3 = r',+via+\s+[a-z]+'
+    pattern_2 = r'(\s+via+\s+[a-z]+)|(\s+viale+\s+[a-z]+)|(^via+\s+[a-z]+)|(^viale+\s+[a-z]+)|(,+via+\s+[a-z]+)|(,+viale+\s+[a-z]+)'
+    pattern_3 = r'(\s+piazza+\s+[a-z]+)|(^piazza+\s+[a-z]+)|(,+piazza+\s+[a-z]+)|(\s+corso+\s+[a-z]+)|(^corso+\s+[a-z]+)|(,+corso+\s+[a-z]+)'
+    pattern_4 = r'(universita+\s+cattolica)|(unione+\s+cattolica)|(student(e|i)+\s+cattolica)'
     list_locations = list_locations.apply(lambda x: re.sub(emoji_pattern,'', x))\
                                    .apply(lambda x: unidecode.unidecode(x))\
                                    .apply(lambda x: x.lower())\
                                    .apply(lambda x: re.sub(pattern_1,' ', x))\
                                    .apply(lambda x: re.sub(pattern_2,' ', x))\
                                    .apply(lambda x: re.sub(pattern_3,', ', x))\
+                                   .apply(lambda x: re.sub(pattern_4,', ', x))\
                                    .apply(lambda x: " ".join(x.split()))\
                                    .apply(lambda x: re.sub(", ",',', x))\
                                    
