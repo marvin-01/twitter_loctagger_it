@@ -50,7 +50,7 @@ class tag_location(object):
         self.state=state;self.df_istat=df_istat;self.df_regions=df_regions
         self.df_state=df_state
         
-    def __call__(self, separate=True, words=1):
+    def __call__(self):
         #City
         comma_sep = self.location.str.split(',').to_list()        
         self.df["city_der"] = self.main_loop(comma_sep, self.cities)
