@@ -18,7 +18,7 @@ from twitter_loctagger_it import geocode
 ```python
 df_output = geocoder.tag_location(df_input)()
 ```
-For example, let `df_input` be the following list of users
+For example, once we have retreived the information for a list of users through the Twitter API, we start by creating a Series object (`df_input`). This object will have one column called *location_original* that contains the list of the self-reported *location* for each users. As the index of this Series object we put the corresponding *id*. As a result, `df_input` should look something like this
 
 | id        | location_original          |
 |-----------|----------------------------|
@@ -27,7 +27,7 @@ For example, let `df_input` be the following list of users
 |91842195	  |Nel Paese dei Balocchi      |
 |244754469  |monsampolo del tronto,marche|
 
-Then, the result `df_output` would be
+Then, by running the command above, the result `df_output` would be
 
 | id        | location_original          |city                  |	province   	| province_code |	region      	| geographic_ripartition | state |
 |-----------|----------------------------|----------------------|-------------|---------------|--------------|------------------------|-------|
