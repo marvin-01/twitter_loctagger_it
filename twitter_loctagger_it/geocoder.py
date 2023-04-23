@@ -14,17 +14,19 @@ class tag_location(object):
         df['location_clean'] = clean_list(df.iloc[:,0]); df['id']=df.index
         df_istat = pd.read_excel(rel_path('istat.xlsx'),names=['city_string','city','province',\
                                  'province_code','region','geographic_ripartition','state'],
-                                 na_filter = False).apply(lambda x: x.str.lower())
+                                 na_filter = False)
                                
         df_regions = pd.read_excel(rel_path('regions.xlsx'),names=['region_string',\
-                                  'region','geographic_ripartition','state']).apply(lambda x: x.str.lower())
+                                  'region','geographic_ripartition','state'])
 
         #Generate comparison sets of cities and regions (without accents and without "-")
-        df_istat.city_string=df_istat.city_string.apply(lambda x: unidecode.unidecode(x))\
+        df_istat.city_string=df_istat.city_string.apply(lambda x: x.lower())\
+                     .apply(lambda x: unidecode.unidecode(x))\
                      .apply(lambda x: re.sub("-",' ', x)).apply(lambda x: x.strip())
-        df_regions.region_string=df_regions.region_string.apply(lambda x: unidecode.unidecode(x))\
+        df_regions.region_string=df_regions.region_string.apply(lambda x: x.lower())\
+                      .apply(lambda x: unidecode.unidecode(x))\
                       .apply(lambda x: re.sub("-",' ', x)).apply(lambda x: x.strip())
-        df_state = [['italy','italia'],['italia','italia']]
+        df_state = [['italy','Italia'],['italia','Italia']]
         df_state = pd.DataFrame(df_state, columns=['state_string', 'state'])
 
         duplicate_cities = set(['paternò','paterno','san teodoro','castro','peglio',\
