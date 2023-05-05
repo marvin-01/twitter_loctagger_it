@@ -6,7 +6,7 @@
 
 ## Installation
 ```
-pip install twitter_loctagger_it
+pip install twitter-loctagger-it
 ```
 
 ## How to use
