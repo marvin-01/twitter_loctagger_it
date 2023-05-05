@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+setup.cfg
+twitter_loctagger_it/__init__.py
+twitter_loctagger_it/geocoder.py
+twitter_loctagger_it/istat.xlsx
+twitter_loctagger_it/regions.xlsx
+twitter_loctagger_it.egg-info/PKG-INFO
+twitter_loctagger_it.egg-info/SOURCES.txt
+twitter_loctagger_it.egg-info/dependency_links.txt
+twitter_loctagger_it.egg-info/top_level.txt
