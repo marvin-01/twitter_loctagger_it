@@ -12,7 +12,7 @@ pip install twitter-loctagger-it
 ## How to use
 1. Import the package as follows:
 ```python
-from twitter_loctagger_it import geocode
+from twitter_loctagger_it import geocoder
 ```
 2. Run the following command:
 ```python
