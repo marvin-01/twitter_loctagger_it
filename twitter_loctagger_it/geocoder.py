@@ -7,7 +7,7 @@ class tag_location(object):
     part of a user profile.
     
     :param location: List of 'location' fields.
-    :type location: List / Series object
+    :type location: List / Series object.
     """
     
     def __init__(self, df):
